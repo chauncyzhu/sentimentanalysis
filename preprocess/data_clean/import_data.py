@@ -9,7 +9,7 @@ import utils.sentiment_dict_path as sdict
 """
 #用pandas读取csv数据并转换成列表格式，注意分词后的内容都放在了content列
 def __read_data(filename):
-    pd_data = pd.read_csv(filename)
+    pd_data = pd.read_csv(filename,index_col=0)
     #对pd_data的每一列数据进行还原
     # for name in pd_data.index:
     #     pd_data[name] = pd_data[name].apply(lambda x:eval(x))
@@ -32,11 +32,24 @@ def import_weibo():
     return (pos_weibo, neg_weibo)
 
 def import_sentiment_dict():
-    pass
+    pos = __read_data(sdict.POS_DICT)
+    neg = __read_data(sdict.NEG_DICT)
+    plus = __read_data(sdict.PLUS_DICT)
+    no = __read_data(sdict.NO_DICT)
+    print(pos)
+    print(neg)
+    print(plus)
+    print(no)
+    # 返回积极和消极数据
+    return (pos,neg,plus,no)
 
 
 if __name__ == '__main__':
-    import_comment()
+    #import_comment()   #pos:10676条  neg:10427
+    #import_weibo()    #pos:199574  neg:51743  #看来还是有点少应该把另外两种负面的加进去
+    import_sentiment_dict()  #pos:6506  neg:11185  plus:182  no:18
+
+    pass
 
 
 
