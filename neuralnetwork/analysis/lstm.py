@@ -22,7 +22,8 @@ def embedding_matrix(vova_csv,embedding_dim,feature_name):
     :return:
     """
     #从vova_csv中读取文件
-    vova_value = rd.read_csv(vova_csv)
+    vova_value = rd.read_csv(vova_csv,encoding="gbk")
+    print(vova_value)
     embedding_matrix = np.zeros((len(vova_value) + 1, embedding_dim))
     vova_value_list = list(vova_value[feature_name])
     for i in range(len(vova_value)):
@@ -32,7 +33,6 @@ def embedding_matrix(vova_csv,embedding_dim,feature_name):
 
 def lstm(trainData,trainMark,testData,testMark,embedding_dim,embedding_matrix,maxlen):
     # 填充数据，将每个序列长度保持一致
-    print(trainData)
     trainData = list(sequence.pad_sequences(trainData,maxlen=maxlen,dtype='float64'))  # sequence返回的是一个numpy数组，pad_sequences用于填充指定长度的序列，长则阶段，短则补0，由于下面序号为0时，对应值也为0，因此可以这样
     testData = list(sequence.pad_sequences(testData,maxlen=maxlen,dtype='float64'))  # sequence返回的是一个numpy数组，pad_sequences用于填充指定长度的序列，长则阶段，短则补0
 
@@ -70,23 +70,23 @@ if __name__ == '__main__':
     vova_csv = sdp.VOCA_COMMENT
     embedding_dim = 1
     maxlen = 50
-    feature_name = "tf"
+    feature_name = "df_bdc"
     #获得embedding矩阵
     embedding_matrix = embedding_matrix(vova_csv, embedding_dim, feature_name)
 
     #获得训练数据和测试数据
-    pd_train = rd.read_csv(sdp.TRAIN_COMMENT)
-    pd_test = rd.read_csv(sdp.TEST_COMMENT)
+    pd_train = rd.read_csv(sdp.TRAIN_COMMENT,encoding="utf8")
+    pd_test = rd.read_csv(sdp.TEST_COMMENT,encoding="utf8")
 
     def f(x):
         if eval(x) == [1,0]:
             return 1
         else:
             return 0
-    pd_train['tf'] = pd_train['tf'].apply(cd.getOriginalValue)
-    pd_test['tf'] = pd_test['tf'].apply(cd.getOriginalValue)
+    pd_train['sequence'] = pd_train['sequence'].apply(cd.getOriginalValue)  #序号向量
+    pd_test['sequence'] = pd_test['sequence'].apply(cd.getOriginalValue)
 
     pd_train['class'] = pd_train['class'].apply(f)
     pd_test['class'] = pd_test['class'].apply(f)
 
-    lstm(list(pd_train['tf']), list(pd_train['class']), list(pd_test['tf']), list(pd_test['class']), embedding_dim,embedding_matrix,maxlen)
+    lstm(list(pd_train['sequence']), list(pd_train['class']), list(pd_test['sequence']), list(pd_test['class']), embedding_dim,embedding_matrix,maxlen)
