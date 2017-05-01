@@ -29,14 +29,17 @@ def __voca_dict(class_num,pos_file,neg_file,voca_csv=None):
     # 如需增加更多term weighting schema，在这里添加
     feature.getBDCVector(voca_dict, class_num, "bdc")  # 根据字典计算BDC值，需要指定index
     feature.getDFBDCVector(voca_dict, class_num, "df_bdc")  # 根据字典计算DF_BDC值，需要指定index
+    feature.getTFIDF(voca_dict, class_num, "tf_idf")  # 根据字典计算DF_BDC值，需要指定index
+    feature.getTFRF(voca_dict, class_num, "tf_rf")  # 根据字典计算DF_BDC值，需要指定index
+
 
     if voca_csv:  # 如果存在则写入文件中
-        voca_dict.to_csv(voca_csv)
+        voca_dict.to_csv(voca_csv,encoding="utf8")
 
     print(voca_dict)
     return pd_train, pd_test, voca_dict
 
-def __generate_vector(pd_train,pd_test,voca_dict,feature_name,train_csv=None,test_csv=None):
+def __generate_vector(pd_train,pd_test,voca_dict,train_csv=None,test_csv=None):
     """
     转换成不同的向量
     :param pd_train:训练集，dataframe类型
@@ -52,20 +55,22 @@ def __generate_vector(pd_train,pd_test,voca_dict,feature_name,train_csv=None,tes
     pd_train_copy = pd_train.copy()  #防止数据干扰
     pd_test_copy = pd_test.copy()
 
-    # 测试集和训练集转为向量，在神经网络中使序号向量
-    tv.changeToFeatureVector(pd_train_copy, voca_dict, feature_name)
-    tv.changeToFeatureVector(pd_test_copy, voca_dict, feature_name)
-    if train_csv:
-        pd_train_copy.to_csv(train_csv,encoding="utf8")  # 写入训练文件中
-    if test_csv:
-        pd_test_copy.to_csv(test_csv,encoding="utf8")  # 写入测试文件中
+    # 测试集和训练集转为序号向量，存放在sequence列中在神经网络中使序号向量
+    # tv.changeToFeatureVector(pd_train_copy, voca_dict,train_csv)
+    # tv.changeToFeatureVector(pd_test_copy, voca_dict,test_csv)
+
+    #转为特征向量
+    tv.changeToBinaryVector(pd_train_copy, voca_dict,train_csv)
+    tv.changeToBinaryVector(pd_test_copy, voca_dict, test_csv)
 
 if __name__ == '__main__':
-    feature_name = "tf"
     #由于只区分积极、消极，因此只有两个类
     pd_train, pd_test, voca_dict = __voca_dict(2, sdp.POS_COMMENT, sdp.NEG_COMMENT, voca_csv=sdp.VOCA_COMMENT)
 
     #转换成序号向量
-    __generate_vector(pd_train, pd_test, voca_dict,feature_name,train_csv=sdp.TRAIN_COMMENT, test_csv=sdp.TEST_COMMENT)
+    __generate_vector(pd_train, pd_test, voca_dict,train_csv=sdp.TRAIN_BINARY_COMMENT, test_csv=sdp.TEST_BINARY_COMMENT)
 
-
+    # pd_train, pd_test, voca_dict = __voca_dict(2, sdp.POS_WEIBO, sdp.NEG_WEIBO, voca_csv=sdp.VOCA_WEIBO)
+    #
+    # #转换成序号向量
+    # __generate_vector(pd_train, pd_test, voca_dict,train_csv=sdp.TRAIN_WEIBO, test_csv=sdp.TEST_WEIBO)

@@ -34,7 +34,7 @@ def getRelativeValue(pd_data,voca_data,class_num):
     for i in voca:
         word_appear_set.append(copy.deepcopy(temp))
         word_doc_set.append(copy.deepcopy(temp))
-    print 'calculating'
+    print('calculating')
     begin = time.time()
     #对每一份文档进行循环
     for index, row in pd_data.iterrows():

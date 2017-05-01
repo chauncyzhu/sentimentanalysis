@@ -22,7 +22,7 @@ def embedding_matrix(vova_csv,embedding_dim,feature_name):
     :return:
     """
     #从vova_csv中读取文件
-    vova_value = rd.read_csv(vova_csv,encoding="gbk")
+    vova_value = rd.read_csv(vova_csv,encoding="utf8")  #注意这里，comment中voca编码为gbk，weibo中编码为utf8
     print(vova_value)
     embedding_matrix = np.zeros((len(vova_value) + 1, embedding_dim))
     vova_value_list = list(vova_value[feature_name])
@@ -67,16 +67,25 @@ def lstm(trainData,trainMark,testData,testMark,embedding_dim,embedding_matrix,ma
     print('Test accuracy:', acc)
 
 if __name__ == '__main__':
-    vova_csv = sdp.VOCA_COMMENT
+    # vova_csv = sdp.VOCA_COMMENT
+    # train_csv = sdp.TRAIN_COMMENT
+    # test_csv = sdp.TEST_COMMENT
+    vova_csv = sdp.VOCA_WEIBO
+    train_csv = sdp.TRAIN_WEIBO
+    test_csv = sdp.TEST_WEIBO
     embedding_dim = 1
-    maxlen = 50
-    feature_name = "df_bdc"
+    maxlen = 100
+    feature_name = "tf"
     #获得embedding矩阵
     embedding_matrix = embedding_matrix(vova_csv, embedding_dim, feature_name)
 
     #获得训练数据和测试数据
-    pd_train = rd.read_csv(sdp.TRAIN_COMMENT,encoding="utf8")
-    pd_test = rd.read_csv(sdp.TEST_COMMENT,encoding="utf8")
+    pd_train = rd.read_csv(train_csv,encoding="utf8")
+    pd_test = rd.read_csv(test_csv,encoding="utf8")
+
+    #控制训练集和测试集数量，此时仅仅为了测试代码是否正确，不能作为测试集和训练集
+    pd_train = pd_train.head(1000).append(pd_train.tail(1000))
+    pd_test = pd_test.head(200).append(pd_test.tail(1000))
 
     def f(x):
         if eval(x) == [1,0]:
