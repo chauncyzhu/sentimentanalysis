@@ -26,6 +26,7 @@ def getTrainAndTest(pos_file,neg_file):
 
     print(pd_train)
     print(pd_test)
+    print(pd_train['description'],pd_train["content"])
     return (pd_train,pd_test)
 
 if __name__ == '__main__':
